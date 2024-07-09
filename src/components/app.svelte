@@ -15,9 +15,11 @@
 
   async function uploadFiles(files) {
     for (const file of files) {
+      const name = file.name.split('.')[0].toLowerCase().replaceAll(' ', '-');
+      const takenCount = 0
       await processRetryQueue();
-      const id = uploadEmoji(file, (error) => {
-        handleResponse(file, error, id);
+      const id = uploadEmoji(file, name, (error) => {
+        handleResponse(file, name, takenCount, error, id);
       });
       uploadsStatusById = {
         ...uploadsStatusById,
@@ -29,7 +31,7 @@
       uploads = [
         ...uploads,
         {
-          file,
+          file, 
           id,
         },
       ];
@@ -47,23 +49,38 @@
 
   async function processRetryQueue() {
     while (retryQueue.length > 0) {
-      const { id, file } = retryQueue.pop();
-      uploadEmoji(file, (error) => {
-        handleResponse(file, error, id);
+      const { id, file, name, takenCount} = retryQueue.pop();
+      if (takenCount > 0) {
+        let newName = name + "-" + takenCount;
+      } else {
+        let newName = name;
+      }
+      uploadEmoji(file, newName, (error) => {
+        handleResponse(file, name, takenCount, error, id);
       });
       await sleep(1000);
     }
   }
 
-  async function handleResponse(file, error, id) {
+  async function handleResponse(file, name, takenCount, error, id) {
     if (error) {
       if (error && error.message && error.message.includes("429")) {
-        retryQueue.push({ id, file });
+        retryQueue.push({ id, file, name, takenCount });
         uploadsStatusById = {
           ...uploadsStatusById,
           [id]: {
             type: "uploading",
             message: "Rate limit detected. Retrying...",
+          },
+        };
+      } else if (error && error.message && error.message.includes("name_taken")) {
+        takenCount++
+        retryQueue.push({ id, file, name, takenCount });
+        uploadsStatusById = {
+          ...uploadsStatusById,
+          [id]: {
+            type: "uploading",
+            message: `Name taken. Retrying as ${name}-${takenCount}...`,
           },
         };
       } else {

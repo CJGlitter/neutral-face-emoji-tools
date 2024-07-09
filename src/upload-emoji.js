@@ -15,12 +15,11 @@ ConcurrencyManager(slackApi, MAX_CONCURRENT_REQUESTS);
 
 const NO_OP = function () {};
 
-export default function uploadEmoji (file, callback = NO_OP) {
+export default function uploadEmoji (file, name, callback = NO_OP) {
   const { apiToken, versionUid } = getSlackApiData();
   const timestamp = Date.now() / 1000;  
   const version = versionUid ? versionUid.substring(0, 8) : 'noversion';
   const id = uuid.v4();
-  const name = file.name.split('.')[0].toLowerCase().replaceAll(' ', '-');
 
   const formData = new FormData();
   formData.append('name', name);
