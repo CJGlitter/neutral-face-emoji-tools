@@ -150,8 +150,8 @@
     <img class="icon heading" src="{SET_ICON_URL}" alt="" />
     <span class="text">Bulk Emoji Uploader</span>
   </h4>
-  <p class="subheading">Drag and drop images into the area below. Any images dropped there will be automatically uploaded using their filename as the emoji name.</p>
-  <p class="input-note">Example: <span class="normal">"ditto.gif" will be added as "ditto"</span></p>
+  <p class="subheading">Drag and drop images into the area below. Any images dropped there will be automatically uploaded using their filename as the emoji name with dashes instead of spaces.</p>
+  <p class="input-note">Example: <span class="normal">"ditto.gif" will be added as "ditto"</span> and <span class="normal">"Ditto Smiles.gif" will be added as "ditto-smiles"</span></p>
   <FileDropzone on:filesadded={handleFilesAdded} />
   <ul class="uploads">
     {#each uploads as upload (upload.id)}
